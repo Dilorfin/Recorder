@@ -25,7 +25,12 @@ public class FrontCameraService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        mServiceCamera = Camera.open(1);
+        mServiceCamera = chooseFrontCamera();
+        if (mServiceCamera == null)
+        {
+            Log.e(TAG, "No camera has been opened");
+            return;
+        }
         mSurfaceHolder = SharedValues.mSurfaceHolder;
 
         startRecording();
@@ -40,6 +45,23 @@ public class FrontCameraService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    private Camera chooseFrontCamera()
+    {
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        int cameraCount = Camera.getNumberOfCameras();
+        for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
+            Camera.getCameraInfo(camIdx, cameraInfo);
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                try {
+                    return Camera.open(camIdx);
+                } catch (RuntimeException e) {
+                    Log.e(TAG, "Camera failed to open: " + e.getMessage());
+                }
+            }
+        }
         return null;
     }
 

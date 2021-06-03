@@ -20,9 +20,7 @@ public class FrontCameraRecorder extends Recorder {
     }
 
     public void startRecording()
-    {
-
-    }
+    { }
 
     public void stopRecording()
     {

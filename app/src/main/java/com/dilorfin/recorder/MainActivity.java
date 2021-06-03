@@ -17,18 +17,25 @@ import androidx.core.app.ActivityCompat;
 import com.dilorfin.recorder.recorders.FrontCameraRecorder;
 import com.dilorfin.recorder.recorders.Recorder;
 import com.dilorfin.recorder.recorders.ScreenRecorder;
+import com.hbisoft.hbrecorder.HBRecorderListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener
+import static com.hbisoft.hbrecorder.Constants.MAX_FILE_SIZE_REACHED_ERROR;
+import static com.hbisoft.hbrecorder.Constants.SETTINGS_ERROR;
+
+public class MainActivity extends AppCompatActivity
+        implements View.OnClickListener, HBRecorderListener
 {
     private final String TAG = "Recorder-MainActivity";
     private Recorder[] recorders;
 
     private boolean isRecording = false;
+
+    ToggleButton toggleButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,11 +46,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.grantPermissions();
 
         SharedValues.mSurfaceHolder = ((SurfaceView)findViewById(R.id.surfaceView)).getHolder();
+        toggleButton = findViewById(R.id.toggleButton);
 
         recorders = new Recorder[]{
                 new FrontCameraRecorder(this),
                 new ScreenRecorder(this)
         };
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopRecording();
+        super.onDestroy();
     }
 
     @Override
@@ -58,8 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             stopRecording();
         }
-
-        ((ToggleButton)view).setChecked(isRecording);
     }
 
     @Override
@@ -73,18 +85,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void startRecording()
     {
-        isRecording = true;
         for (Recorder recorder : recorders) {
             recorder.startRecording();
         }
+        isRecording = true;
+        toggleButton.setChecked(true);
     }
 
     private void stopRecording()
     {
-        isRecording = false;
         for (Recorder recorder : recorders) {
             recorder.stopRecording();
         }
+        isRecording = false;
+        toggleButton.setChecked(false);
     }
 
     private void createFolder()
@@ -128,6 +142,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             temp = permissions.toArray(temp);
 
             ActivityCompat.requestPermissions(this, temp, 44);
+        }
+    }
+
+    @Override
+    public void HBRecorderOnStart() {
+
+    }
+
+    @Override
+    public void HBRecorderOnComplete() {
+        stopRecording();
+    }
+
+    @Override
+    public void HBRecorderOnError(int errorCode, String reason)
+    {
+        if (errorCode == MAX_FILE_SIZE_REACHED_ERROR)
+        {
+            Log.e(TAG, "Max Size reached (" + reason + ")");
+        }
+        else if (errorCode == SETTINGS_ERROR)
+        {
+            // Error 38 happens when
+            // - the selected video encoder is not supported
+            // - the output format is not supported
+            // - if another app is using the microphone
+
+            Log.e(TAG, "Settings Error (" + reason + ")");
+        }
+        else
+        {
+            Log.e(TAG, errorCode + " (" + reason + ")");
         }
     }
 }

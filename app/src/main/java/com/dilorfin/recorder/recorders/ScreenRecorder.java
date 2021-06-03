@@ -15,7 +15,7 @@ import static com.hbisoft.hbrecorder.Constants.MAX_FILE_SIZE_REACHED_ERROR;
 import static com.hbisoft.hbrecorder.Constants.SETTINGS_ERROR;
 
 public class ScreenRecorder extends Recorder
-        implements HBRecorderListener
+
 {
     private final String TAG = "ScreenRecorder";
 
@@ -25,7 +25,7 @@ public class ScreenRecorder extends Recorder
     {
         super(context);
 
-        hbRecorder = new HBRecorder(context, this);
+        hbRecorder = new HBRecorder(context, (HBRecorderListener) context);
         hbRecorder.enableCustomSettings();
         hbRecorder.isAudioEnabled(true);
         hbRecorder.setAudioBitrate(128000);
@@ -37,8 +37,6 @@ public class ScreenRecorder extends Recorder
         hbRecorder.setVideoBitrate(12000000);
         hbRecorder.setOutputFormat("THREE_GPP");
         hbRecorder.setFileName("screen");
-
-        hbRecorder.not
     }
 
     @Override
@@ -75,32 +73,6 @@ public class ScreenRecorder extends Recorder
             hbRecorder.setOutputPath(SharedValues.outputPath);
             hbRecorder.startScreenRecording(data, resultCode, (Activity)context);
             Log.d(TAG, "Start recording");
-        }
-    }
-
-    @Override
-    public void HBRecorderOnStart() {
-
-    }
-
-    @Override
-    public void HBRecorderOnComplete() {
-
-    }
-
-    @Override
-    public void HBRecorderOnError(int errorCode, String reason) {
-        if (errorCode == MAX_FILE_SIZE_REACHED_ERROR) {
-            Log.e(TAG, "Max Size reached (" + reason + ")");
-        } else if (errorCode == SETTINGS_ERROR) {
-            // Error 38 happens when
-            // - the selected video encoder is not supported
-            // - the output format is not supported
-            // - if another app is using the microphone
-
-            Log.e(TAG, "Settings Error (" + reason + ")");
-        } else {
-            Log.e(TAG, errorCode + " (" + reason + ")");
         }
     }
 }
