@@ -6,10 +6,7 @@ import android.content.Intent;
 public abstract class Recorder {
     protected final Context context;
 
-    public Recorder(Context context)
-    {
-        this.context = context;
-    }
+    public Recorder(Context context) { this.context = context; }
 
     public abstract void startRecording();
     public abstract void stopRecording();

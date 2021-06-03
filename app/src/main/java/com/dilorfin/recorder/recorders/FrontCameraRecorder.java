@@ -1,23 +1,16 @@
 package com.dilorfin.recorder.recorders;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-import com.dilorfin.recorder.SharedValues;
 import com.dilorfin.recorder.services.FrontCameraService;
+import com.dilorfin.recorder.utils.Logger;
 
-import static android.app.Activity.RESULT_OK;
-
-public class FrontCameraRecorder extends Recorder {
-    private final String TAG = "FrontCameraRecorder";
-
+public class FrontCameraRecorder extends Recorder
+{
     private boolean _isRecording = false;
-    public FrontCameraRecorder(Context context)
-    {
-        super(context);
-    }
+
+    public FrontCameraRecorder(Context context) { super(context); }
 
     public void startRecording()
     { }
@@ -26,7 +19,7 @@ public class FrontCameraRecorder extends Recorder {
     {
         if(!isRecording()) return;
 
-        Log.d(TAG, "Stopping service");
+        Logger.writeLine("Stopping service");
 
         context.stopService(new Intent(context, FrontCameraService.class));
         _isRecording = false;
@@ -42,7 +35,7 @@ public class FrontCameraRecorder extends Recorder {
     {
         if(isRecording()) return;
 
-        Log.d(TAG, "Starting service");
+        Logger.writeLine("Starting service");
 
         Intent intent = new Intent(context, FrontCameraService.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

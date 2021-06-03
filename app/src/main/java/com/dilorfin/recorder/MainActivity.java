@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ToggleButton;
@@ -17,6 +16,7 @@ import androidx.core.app.ActivityCompat;
 import com.dilorfin.recorder.recorders.FrontCameraRecorder;
 import com.dilorfin.recorder.recorders.Recorder;
 import com.dilorfin.recorder.recorders.ScreenRecorder;
+import com.dilorfin.recorder.utils.Logger;
 import com.hbisoft.hbrecorder.HBRecorderListener;
 
 import java.io.File;
@@ -30,7 +30,6 @@ import static com.hbisoft.hbrecorder.Constants.SETTINGS_ERROR;
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, HBRecorderListener
 {
-    private final String TAG = "Recorder-MainActivity";
     private Recorder[] recorders;
 
     private boolean isRecording = false;
@@ -42,6 +41,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Logger.outputPath = "/storage/emulated/0/Android/data/com.dilorfin.recorder/files/";
 
         this.grantPermissions();
 
@@ -78,7 +79,8 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        for (Recorder recorder : recorders) {
+        for (Recorder recorder : recorders)
+        {
             recorder.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         File folder = new File(getExternalFilesDir(Environment.DIRECTORY_DCIM)+"/Recorder", simpleDateFormat.format(new Date()));
         if (!folder.exists()) {
             if (folder.mkdirs()) {
-                Log.i(TAG, "Folder created");
+                Logger.writeLine("Folder created");
             }
         }
         SharedValues.outputPath = folder.getAbsolutePath();
@@ -137,7 +139,7 @@ public class MainActivity extends AppCompatActivity
 
         if (!hasAllPermissions)
         {
-            Log.d(TAG, "Requesting permissions");
+            Logger.writeLine("Requesting permissions");
             String[] temp = new String[permissions.size()];
             temp = permissions.toArray(temp);
 
@@ -146,21 +148,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void HBRecorderOnStart() {
-
-    }
+    public void HBRecorderOnStart() { }
 
     @Override
-    public void HBRecorderOnComplete() {
-        stopRecording();
-    }
+    public void HBRecorderOnComplete() { stopRecording(); }
 
     @Override
     public void HBRecorderOnError(int errorCode, String reason)
     {
         if (errorCode == MAX_FILE_SIZE_REACHED_ERROR)
         {
-            Log.e(TAG, "Max Size reached (" + reason + ")");
+            Logger.writeLine("Max Size reached (" + reason + ")");
         }
         else if (errorCode == SETTINGS_ERROR)
         {
@@ -169,11 +167,11 @@ public class MainActivity extends AppCompatActivity
             // - the output format is not supported
             // - if another app is using the microphone
 
-            Log.e(TAG, "Settings Error (" + reason + ")");
+            Logger.writeLine("Settings Error (" + reason + ")");
         }
         else
         {
-            Log.e(TAG, errorCode + " (" + reason + ")");
+            Logger.writeLine(errorCode + " (" + reason + ")");
         }
     }
 }

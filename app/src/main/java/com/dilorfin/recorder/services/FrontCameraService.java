@@ -5,30 +5,29 @@ import android.content.Intent;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.dilorfin.recorder.SharedValues;
+import com.dilorfin.recorder.utils.Logger;
 
 import java.io.File;
 import java.io.IOException;
 
-public class FrontCameraService extends Service {
-
-    private final String TAG = "ServiceRecorder";
-
+public class FrontCameraService extends Service
+{
     private SurfaceHolder mSurfaceHolder;
     private static Camera mServiceCamera;
     private MediaRecorder mMediaRecorder;
 
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
 
         mServiceCamera = chooseFrontCamera();
         if (mServiceCamera == null)
         {
-            Log.e(TAG, "No camera has been opened");
+            Logger.writeLine("No camera has been opened");
             return;
         }
         mSurfaceHolder = SharedValues.mSurfaceHolder;
@@ -37,51 +36,24 @@ public class FrontCameraService extends Service {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         stopRecording();
 
         super.onDestroy();
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    public IBinder onBind(Intent intent) { return null; }
 
-    private Camera chooseFrontCamera()
+    public void startRecording()
     {
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        int cameraCount = Camera.getNumberOfCameras();
-        for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
-            Camera.getCameraInfo(camIdx, cameraInfo);
-            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                try {
-                    return Camera.open(camIdx);
-                } catch (RuntimeException e) {
-                    Log.e(TAG, "Camera failed to open: " + e.getMessage());
-                }
-            }
-        }
-        return null;
-    }
-
-    public void startRecording(){
         try {
             Camera.Parameters p = mServiceCamera.getParameters();
-            Camera.Size size = null;
-            for(Camera.Size s : p.getSupportedPictureSizes()) {
-                if (size == null) {
-                    size = s;
-                }
-                else {
-                    if (size.width < s.width)
-                    {
-                        size = s;
-                    }
-                }
-            }
+            Camera.Size size = getMaxCameraSize(p);
 
             p.setPictureSize(size.width, size.height);
+
             mServiceCamera.setParameters(p);
 
             mServiceCamera.unlock();
@@ -90,9 +62,11 @@ public class FrontCameraService extends Service {
             mMediaRecorder.setCamera(mServiceCamera);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+
+            mMediaRecorder.setVideoEncodingBitRate(40000000);
 
             File file = new File(SharedValues.outputPath, "front-camera.mp4");
 
@@ -106,17 +80,18 @@ public class FrontCameraService extends Service {
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
-            Log.d(TAG, "Recording Started");
+            Logger.writeLine("Recording Started");
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.writeLine(e.getMessage());
         }
     }
 
-    public void stopRecording() {
+    public void stopRecording()
+    {
         try {
             mServiceCamera.reconnect();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.writeLine(e.getMessage());
         }
         mMediaRecorder.stop();
         mMediaRecorder.reset();
@@ -126,6 +101,46 @@ public class FrontCameraService extends Service {
         mServiceCamera.release();
         mServiceCamera = null;
 
-        Log.d(TAG, "Recording Stopped");
+        Logger.writeLine("Recording Stopped");
+    }
+
+    private Camera chooseFrontCamera()
+    {
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        int cameraCount = Camera.getNumberOfCameras();
+        for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
+            Camera.getCameraInfo(camIdx, cameraInfo);
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                try {
+                    return Camera.open(camIdx);
+                } catch (RuntimeException e) {
+                    Logger.writeLine("Camera failed to open: " + e.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    private Camera.Size getMaxCameraSize(Camera.Parameters parameters) throws Exception
+    {
+        Camera.Size size = null;
+        for(Camera.Size s : parameters.getSupportedPictureSizes())
+        {
+            if (size == null)
+            {
+                size = s;
+            }
+            else {
+                if (size.width < s.width)
+                {
+                    size = s;
+                }
+            }
+        }
+        if (size == null)
+        {
+            throw new Exception("No camera size selected");
+        }
+        return size;
     }
 }
