@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         File folder = new File(getExternalFilesDir(Environment.DIRECTORY_DCIM)+"/Recorder", simpleDateFormat.format(new Date()));
         if (!folder.exists()) {
             if (folder.mkdirs()) {
-                Logger.writeLine("Folder created");
+                Logger.debug("Folder created");
             }
         }
         SharedValues.outputPath = folder.getAbsolutePath();
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
 
         if (!hasAllPermissions)
         {
-            Logger.writeLine("Requesting permissions");
+            Logger.debug("Requesting permissions");
             String[] temp = new String[permissions.size()];
             temp = permissions.toArray(temp);
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (errorCode == MAX_FILE_SIZE_REACHED_ERROR)
         {
-            Logger.writeLine("Max Size reached (" + reason + ")");
+            Logger.error("HBRecorder max Size reached (" + reason + ")");
         }
         else if (errorCode == SETTINGS_ERROR)
         {
@@ -167,11 +167,11 @@ public class MainActivity extends AppCompatActivity
             // - the output format is not supported
             // - if another app is using the microphone
 
-            Logger.writeLine("Settings Error (" + reason + ")");
+            Logger.error("HBRecorder settings Error (" + reason + ")");
         }
         else
         {
-            Logger.writeLine(errorCode + " (" + reason + ")");
+            Logger.error("HBRecorder " + errorCode + " (" + reason + ")");
         }
     }
 }

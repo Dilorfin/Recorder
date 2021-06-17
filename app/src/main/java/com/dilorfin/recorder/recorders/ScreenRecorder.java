@@ -28,23 +28,21 @@ public class ScreenRecorder extends Recorder
     @Override
     public void startRecording()
     {
-        if (!this.isRecording())
-        {
-            MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) context.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-            Intent permissionIntent = mediaProjectionManager != null ? mediaProjectionManager.createScreenCaptureIntent() : null;
-            ((Activity) context).startActivityForResult(permissionIntent, SharedValues.SCREEN_RECORD_REQUEST_CODE);
-            Logger.writeLine("Request MediaProjection");
-        }
+        if (this.isRecording()) { return; }
+
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) context.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        Intent permissionIntent = mediaProjectionManager != null ? mediaProjectionManager.createScreenCaptureIntent() : null;
+        ((Activity) context).startActivityForResult(permissionIntent, SharedValues.SCREEN_RECORD_REQUEST_CODE);
+        Logger.debug("Request MediaProjection");
     }
 
     @Override
     public void stopRecording()
     {
-        if (this.isRecording())
-        {
-            hbRecorder.stopScreenRecording();
-            Logger.writeLine("Stop recording");
-        }
+        if (!this.isRecording()) { return; }
+
+        hbRecorder.stopScreenRecording();
+        Logger.debug("Stop recording");
     }
 
     @Override
@@ -57,7 +55,7 @@ public class ScreenRecorder extends Recorder
         {
             hbRecorder.setOutputPath(SharedValues.outputPath);
             hbRecorder.startScreenRecording(data, resultCode, (Activity)context);
-            Logger.writeLine("Start recording");
+            Logger.debug("Start recording");
         }
     }
 }

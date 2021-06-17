@@ -19,7 +19,7 @@ public class FrontCameraRecorder extends Recorder
     {
         if(!isRecording()) return;
 
-        Logger.writeLine("Stopping service");
+        Logger.debug("Stopping service");
 
         context.stopService(new Intent(context, FrontCameraService.class));
         _isRecording = false;
@@ -35,7 +35,7 @@ public class FrontCameraRecorder extends Recorder
     {
         if(isRecording()) return;
 
-        Logger.writeLine("Starting service");
+        Logger.debug("Starting service");
 
         Intent intent = new Intent(context, FrontCameraService.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

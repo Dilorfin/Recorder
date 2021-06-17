@@ -25,11 +25,6 @@ public class FrontCameraService extends Service
         super.onCreate();
 
         mServiceCamera = chooseFrontCamera();
-        if (mServiceCamera == null)
-        {
-            Logger.writeLine("No camera has been opened");
-            return;
-        }
         mSurfaceHolder = SharedValues.mSurfaceHolder;
 
         startRecording();
@@ -80,9 +75,9 @@ public class FrontCameraService extends Service
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
-            Logger.writeLine("Recording Started");
-        } catch (Exception e) {
-            Logger.writeLine(e.getMessage());
+            Logger.debug("Recording Started");
+        } catch (Exception exc) {
+            Logger.error(exc);
         }
     }
 
@@ -90,18 +85,18 @@ public class FrontCameraService extends Service
     {
         try {
             mServiceCamera.reconnect();
-        } catch (IOException e) {
-            Logger.writeLine(e.getMessage());
-        }
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
+            mMediaRecorder.stop();
+            mMediaRecorder.reset();
 
-        mMediaRecorder.release();
+            mMediaRecorder.release();
 
         mServiceCamera.release();
-        mServiceCamera = null;
+            mServiceCamera = null;
 
-        Logger.writeLine("Recording Stopped");
+            Logger.debug("Recording Stopped");
+        } catch (Exception exc) {
+            Logger.error(exc);
+        }
     }
 
     private Camera chooseFrontCamera()
@@ -113,11 +108,14 @@ public class FrontCameraService extends Service
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 try {
                     return Camera.open(camIdx);
-                } catch (RuntimeException e) {
-                    Logger.writeLine("Camera failed to open: " + e.getMessage());
+                } catch (RuntimeException exc) {
+                    Logger.error("Camera failed to open: " + exc);
+                    return null;
                 }
             }
         }
+
+        Logger.error("No front camera was found");
         return null;
     }
 
