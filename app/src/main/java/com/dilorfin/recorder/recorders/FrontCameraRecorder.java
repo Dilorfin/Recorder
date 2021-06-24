@@ -2,32 +2,82 @@ package com.dilorfin.recorder.recorders;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.TextureView;
+import android.widget.FrameLayout;
 
-import com.dilorfin.recorder.services.FrontCameraService;
+import com.dilorfin.recorder.MainActivity;
+import com.dilorfin.recorder.SharedValues;
 import com.dilorfin.recorder.utils.Logger;
+import com.lmy.codec.encoder.Encoder;
+import com.lmy.codec.presenter.VideoRecorder;
+import com.lmy.codec.presenter.impl.VideoRecorderImpl;
+import com.lmy.codec.wrapper.CameraWrapper;
+
+import java.io.File;
 
 public class FrontCameraRecorder extends Recorder
 {
-    private boolean _isRecording = false;
+    private final VideoRecorderImpl mRecorder;
 
-    public FrontCameraRecorder(Context context) { super(context); }
+    public FrontCameraRecorder(Context context) {
+        super(context);
+        TextureView mTextureView = new TextureView(context);
+        mTextureView.setFitsSystemWindows(true);
+        mTextureView.setKeepScreenOn(true);
 
-    public void startRecording()
-    { }
+        ((MainActivity)context).mTextureContainer.addView(mTextureView,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT)
+        );
+
+        mRecorder = new VideoRecorderImpl(context);
+        mRecorder.reset();
+        mRecorder.setOutputSize(720, 1280);
+        mRecorder.setFps(30);
+        mRecorder.enableHardware(true);
+        mRecorder.setCameraIndex(CameraWrapper.CameraIndex.FRONT);
+        mRecorder.setPreviewDisplay(mTextureView);
+        VideoRecorder.OnStateListener onStateListener = new VideoRecorder.OnStateListener() {
+            @Override
+            public void onRecord(Encoder encoder, long timeUs) {
+            }
+
+            @Override
+            public void onPrepared(Encoder encoder) {
+            }
+
+            @Override
+            public void onError(int error, String msg) {
+                Logger.error("Front Camera: " + msg);
+            }
+
+            @Override
+            public void onStop() {
+            }
+        };
+        mRecorder.setOnStateListener(onStateListener);
+
+        File file = new File(SharedValues.outputPath, "front-camera.mp4");
+        mRecorder.setOutputUri(file.getAbsolutePath());
+        mRecorder.prepare();
+    }
+
+    public void startRecording() { }
 
     public void stopRecording()
     {
         if(!isRecording()) return;
 
-        Logger.debug("Stopping service");
+        mRecorder.stop();
+        mRecorder.reset();
 
-        context.stopService(new Intent(context, FrontCameraService.class));
-        _isRecording = false;
+        Logger.debug("Stopping front camera");
     }
 
     @Override
     public boolean isRecording() {
-        return _isRecording;
+        return mRecorder.started();
     }
 
     @Override
@@ -35,11 +85,11 @@ public class FrontCameraRecorder extends Recorder
     {
         if(isRecording()) return;
 
-        Logger.debug("Starting service");
+        if (mRecorder.prepared())
+        {
+            mRecorder.start();
+        }
 
-        Intent intent = new Intent(context, FrontCameraService.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startService(intent);
-        _isRecording = true;
+        Logger.debug("Starting front camera");
     }
 }

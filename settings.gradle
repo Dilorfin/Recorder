@@ -1,2 +1,3 @@
 rootProject.name = "Recorder"
 include ':app'
+include ':codec'

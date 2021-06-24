@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,7 +35,8 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isRecording = false;
 
-    ToggleButton toggleButton;
+    private ToggleButton toggleButton;
+    public FrameLayout mTextureContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,9 +48,9 @@ public class MainActivity extends AppCompatActivity
 
         this.grantPermissions();
 
-        SharedValues.mSurfaceHolder = ((SurfaceView)findViewById(R.id.surfaceView)).getHolder();
+        mTextureContainer = findViewById(R.id.textureContainer);
         toggleButton = findViewById(R.id.toggleButton);
-
+        createFolder();
         recorders = new Recorder[]{
                 new FrontCameraRecorder(this),
                 new ScreenRecorder(this)
@@ -66,7 +68,6 @@ public class MainActivity extends AppCompatActivity
     {
         if (!isRecording)
         {
-            createFolder();
             startRecording();
         }
         else
