@@ -179,22 +179,6 @@ class VideoRecorderImpl(ctx: Context
         return context.video.height
     }
 
-    override fun setFilter(filter: BaseFilter) {
-        if (null == render) {
-            this.filter = filter
-            if (null == this.filter)
-                this.filter = NormalFilter()
-        } else {
-            this.filter = null
-            render?.setFilter(filter)
-        }
-
-    }
-
-    override fun getFilter(): BaseFilter? {
-        return render?.getFilter()
-    }
-
     override fun setOutputUri(uri: String) {
         changeParamsCheck()
         context.ioContext.path = uri

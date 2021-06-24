@@ -7,12 +7,11 @@
 package com.lmy.codec.render
 
 import android.graphics.SurfaceTexture
-import com.lmy.codec.presenter.FilterSupport
 
 /**
  * Created by lmyooyo@gmail.com on 2018/3/27.
  */
-interface Render : FilterSupport {
+interface Render {
     fun onFrameAvailable()
     fun draw()
     fun start(texture: SurfaceTexture?, width: Int, height: Int)

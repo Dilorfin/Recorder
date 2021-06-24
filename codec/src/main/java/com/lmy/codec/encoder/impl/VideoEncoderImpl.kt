@@ -35,7 +35,7 @@ class VideoEncoderImpl(var context: CodecContext,
     : Encoder {
 
     companion object {
-        private val WAIT_TIME = 10000L
+        private const val WAIT_TIME = 10000L
     }
 
     private val outputFormatLock = Object()
@@ -67,7 +67,7 @@ class VideoEncoderImpl(var context: CodecContext,
 
     init {
         initCodec()
-        mPipeline.queueEvent(Runnable { init() })
+        mPipeline.queueEvent({ init() })
     }
 
     private fun initCodec() {
@@ -102,7 +102,7 @@ class VideoEncoderImpl(var context: CodecContext,
     }
 
     override fun getOutputFormat(): MediaFormat {
-        mPipeline.queueEvent(Runnable {
+        mPipeline.queueEvent({
             val index = codec!!.dequeueOutputBuffer(bufferInfo, WAIT_TIME)
             if (MediaCodec.INFO_OUTPUT_FORMAT_CHANGED != index) {
                 getOutputFormat()
@@ -120,11 +120,11 @@ class VideoEncoderImpl(var context: CodecContext,
 
     override fun onFrameAvailable(surfaceTexture: SurfaceTexture?) {
         if (!mEncoding) return
-        mPipeline.queueEvent(Runnable { encode() })
+        mPipeline.queueEvent({ encode() })
     }
 
     override fun setPresentationTime(nsecs: Long) {
-        mPipeline.queueEvent(Runnable {
+        mPipeline.queueEvent({
             this.nsecs = nsecs * 1000
         })
     }
@@ -156,11 +156,11 @@ class VideoEncoderImpl(var context: CodecContext,
              */
             val flag = codec!!.dequeueOutputBuffer(mBufferInfo, WAIT_TIME)
             when (flag) {
-                MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> {//输出缓冲区改变，通常忽略
+                MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> {//Output buffer changes, usually ignored
                     debug_v("INFO_OUTPUT_BUFFERS_CHANGED")
                 }
-                MediaCodec.INFO_TRY_AGAIN_LATER -> {//等待超时，需要再次等待，通常忽略
-//                    debug_v("INFO_TRY_AGAIN_LATER")
+                MediaCodec.INFO_TRY_AGAIN_LATER -> {//Waiting timeout, need to wait again, usually ignored
+//                  debug_v("INFO_TRY_AGAIN_LATER")
                     return false
                 }
                 /**
@@ -172,11 +172,13 @@ class VideoEncoderImpl(var context: CodecContext,
                     onSampleListener?.onFormatChanged(this, codec!!.outputFormat)
                 }
                 else -> {
-                    if (flag < 0) return false//如果小于零，则跳过
-                    val buffer = codec!!.outputBuffers[flag]//否则代表编码成功，可以从输出缓冲区队列取出数据
+                    if (flag < 0) return false//If less than zero, skip
+                    val buffer = codec!!.outputBuffers[flag]//Otherwise, the encoding is successful and the data can be taken out from the output buffer queue
                     if (null != buffer) {
+                        //If the BUFFER_FLAG_END_OF_STREAM signal is not received, it means that the output data is valid
                         val endOfStream = mBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM
-                        if (endOfStream == 0) {//如果没有收到BUFFER_FLAG_END_OF_STREAM信号，则代表输出数据时有效的
+                        if (endOfStream == 0)
+                        {
                             if (mBufferInfo.size != 0) {
                                 ++mFrameCount
                                 buffer.position(mBufferInfo.offset)
@@ -186,7 +188,8 @@ class VideoEncoderImpl(var context: CodecContext,
                                 onRecordListener?.onRecord(this, mBufferInfo.presentationTimeUs)
                             }
                         }
-                        //缓冲区使用完后必须把它还给MediaCodec，以便再次使用，至此一个流程结束，再次循环
+                        //After the buffer is used up, it must be returned to MediaCodec so that it can be used again.
+                        //At this point, the process ends, and the cycle is repeated again.
                         codec!!.releaseOutputBuffer(flag, false)
 //                        if (endOfStream == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
 //                            return true

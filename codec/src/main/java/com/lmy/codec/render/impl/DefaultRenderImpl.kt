@@ -181,18 +181,6 @@ class DefaultRenderImpl(var context: CodecContext,
         pipeline?.queueEvent(runnable)
     }
 
-    override fun setFilter(filter: BaseFilter) {
-        pipeline?.queueEvent(Runnable {
-            initFilter(filter)
-        })
-    }
-
-    override fun getFilter(): BaseFilter? {
-        synchronized(filterLock) {
-            return filter
-        }
-    }
-
     override fun getFrameBuffer(): IntArray {
         synchronized(filterLock) {
             return outputFrameBuffer

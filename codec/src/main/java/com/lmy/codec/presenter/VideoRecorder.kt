@@ -15,7 +15,7 @@ import com.lmy.codec.wrapper.CameraWrapper
 /**
  * Created by lmyooyo@gmail.com on 2018/8/9.
  */
-interface VideoRecorder : FilterSupport, SurfaceTexture.OnFrameAvailableListener {
+interface VideoRecorder : SurfaceTexture.OnFrameAvailableListener {
     fun prepare()
     fun start()
     fun pause()
