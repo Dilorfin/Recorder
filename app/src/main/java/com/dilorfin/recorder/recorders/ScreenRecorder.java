@@ -21,7 +21,14 @@ public class ScreenRecorder extends Recorder
         super(context);
 
         hbRecorder = new HBRecorder(context, (HBRecorderListener) context);
+        hbRecorder.enableCustomSettings();
+
         hbRecorder.isAudioEnabled(false);
+        hbRecorder.setVideoEncoder("VP8");
+        hbRecorder.setOutputFormat("WEBM");
+        hbRecorder.setScreenDimensions(1920, 1080);
+        hbRecorder.setVideoFrameRate(30);
+        hbRecorder.setVideoBitrate(12000000);
         hbRecorder.setFileName("screen");
     }
 
