@@ -37,7 +37,7 @@ abstract class RecycleQueue<T>(val capacity: Int) {
     }
 
     fun poll(): T {
-        return queue!!.poll()
+        return queue!!.poll()!!
     }
 
     @Throws(InterruptedException::class)

@@ -18,7 +18,7 @@ inline fun <reified T> T.debug_v(vararg objects: Any?) {
         Log.v(T::class.simpleName, "null")
         return
     }
-    var msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
+    val msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
     Log.v(T::class.simpleName, msg)
 }
 
@@ -28,7 +28,7 @@ inline fun <reified T> T.debug_d(vararg objects: Any?) {
         Log.d(T::class.simpleName, "null")
         return
     }
-    var msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
+    val msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
     Log.d(T::class.simpleName, msg)
 }
 
@@ -38,7 +38,7 @@ inline fun <reified T> T.debug_w(vararg objects: Any?) {
         Log.w(T::class.simpleName, "null")
         return
     }
-    var msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
+    val msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
     Log.w(T::class.simpleName, msg)
 }
 
@@ -48,7 +48,7 @@ inline fun <reified T> T.debug_i(vararg objects: Any?) {
         Log.i(T::class.simpleName, "null")
         return
     }
-    var msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
+    val msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
     Log.i(T::class.simpleName, msg)
 }
 
@@ -58,7 +58,7 @@ inline fun <reified T> T.debug_e(vararg objects: Any?) {
         Log.e(T::class.simpleName, "null")
         return
     }
-    var msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
+    val msg = if (objects.size == 1) objects[0].toString() else Arrays.toString(objects)
     Log.e(T::class.simpleName, msg)
 }
 
