@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Logger.outputPath = "/storage/emulated/0/Android/data/com.dilorfin.recorder/files/";
+        Logger.outputPath = "/storage/emulated/0/Android/data/com.dilorfin.recorder/logs/";
 
         this.grantPermissions();
 
