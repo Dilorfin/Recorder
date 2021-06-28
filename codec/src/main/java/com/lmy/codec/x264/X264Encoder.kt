@@ -65,12 +65,11 @@ class X264Encoder(private var format: MediaFormat,
         if (BUFFER_FLAG_CODEC_CONFIG == mBufferInfo.flags) {
             //获取SPS，PPS
             getOutFormat(mBufferInfo, buffer!!)
-            return mBufferInfo
         } else {
             buffer!!.position(0)
             buffer!!.limit(size)
-            return mBufferInfo
         }
+        return mBufferInfo
     }
 
     private fun getOutFormat(info: MediaCodec.BufferInfo, data: ByteBuffer) {
@@ -143,7 +142,6 @@ class X264Encoder(private var format: MediaFormat,
         buffer!!.position(0)
         buffer!!.limit(mBufferInfo.size)
         return buffer!!.slice()
-//        return ByteBuffer.wrap(buffer!!.array(), 0, mBufferInfo.size)
     }
 
     /**
