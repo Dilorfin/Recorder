@@ -49,7 +49,7 @@ public class FrontCameraRecorder extends Recorder
 
             @Override
             public void onError(int error, String msg) {
-                Logger.error("Front Camera: " + msg);
+                Logger.error("Front Camera Error: " + msg);
             }
 
             @Override
@@ -63,9 +63,22 @@ public class FrontCameraRecorder extends Recorder
         mRecorder.prepare();
     }
 
-    public void startRecording() { }
+    @Override
+    public void prepare() {
+        if (this.isRecording()){
+            mRecorder.stop();
+        }
+        //mRecorder.reset();
+        //File file = new File(SharedValues.outputPath, "front-camera.mp4");
+        //mRecorder.setOutputUri(file.getAbsolutePath());
+        //mRecorder.prepare();
+    }
 
-    public void stopRecording()
+    @Override
+    public void start() { }
+
+    @Override
+    public void stop()
     {
         if(!isRecording()) return;
 
@@ -88,8 +101,11 @@ public class FrontCameraRecorder extends Recorder
         if (mRecorder.prepared())
         {
             mRecorder.start();
+            Logger.debug("Starting front camera");
         }
-
-        Logger.debug("Starting front camera");
+        else
+        {
+            Logger.error("Front camera isn't prepared to start");
+        }
     }
 }

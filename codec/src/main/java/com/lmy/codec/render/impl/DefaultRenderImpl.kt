@@ -170,7 +170,7 @@ class DefaultRenderImpl(var context: CodecContext,
     }
 
     override fun onFrameAvailable() {
-        pipeline?.queueEvent(Runnable { draw() })
+        pipeline.queueEvent(Runnable { draw() })
     }
 
     fun updateScreenTexture(texture: SurfaceTexture?) {
@@ -178,7 +178,7 @@ class DefaultRenderImpl(var context: CodecContext,
     }
 
     override fun post(runnable: Runnable) {
-        pipeline?.queueEvent(runnable)
+        pipeline.queueEvent(runnable)
     }
 
     override fun getFrameBuffer(): IntArray {

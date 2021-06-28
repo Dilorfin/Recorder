@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (!isRecording)
         {
-            startRecording();
+            prepareRecording();
         }
         else
         {
@@ -84,12 +85,23 @@ public class MainActivity extends AppCompatActivity
         {
             recorder.onActivityResult(requestCode, resultCode, data);
         }
+
+        this.startRecording();
+    }
+
+    private void prepareRecording()
+    {
+        Logger.debug("Preparing recorders");
+        for (Recorder recorder : recorders) {
+            recorder.prepare();
+        }
     }
 
     private void startRecording()
     {
+        Logger.debug("Start recording");
         for (Recorder recorder : recorders) {
-            recorder.startRecording();
+            recorder.start();
         }
         isRecording = true;
         toggleButton.setChecked(true);
@@ -98,7 +110,7 @@ public class MainActivity extends AppCompatActivity
     private void stopRecording()
     {
         for (Recorder recorder : recorders) {
-            recorder.stopRecording();
+            recorder.stop();
         }
         isRecording = false;
         toggleButton.setChecked(false);
@@ -173,6 +185,15 @@ public class MainActivity extends AppCompatActivity
         else
         {
             Logger.error("HBRecorder " + errorCode + " (" + reason + ")");
+        }
+
+        Toast.makeText(getApplicationContext(),
+                "An error occurred. Please, try again",
+                Toast.LENGTH_LONG).show();
+
+        stopRecording();
+        for (Recorder recorder : recorders) {
+            recorder.HBRecorderOnError(errorCode, reason);
         }
     }
 }

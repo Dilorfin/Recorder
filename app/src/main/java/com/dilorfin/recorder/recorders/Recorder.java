@@ -8,9 +8,13 @@ public abstract class Recorder {
 
     public Recorder(Context context) { this.context = context; }
 
-    public abstract void startRecording();
-    public abstract void stopRecording();
+    public abstract void prepare();
+    public abstract void start();
+    public abstract void stop();
     public abstract boolean isRecording();
+
+    public void HBRecorderOnError(int errorCode, String reason)
+    { }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     { }
