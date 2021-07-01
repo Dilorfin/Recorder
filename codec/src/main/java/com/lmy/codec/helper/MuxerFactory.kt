@@ -4,7 +4,6 @@ import android.text.TextUtils
 import com.lmy.codec.entity.CodecContext
 import com.lmy.codec.muxer.Muxer
 import com.lmy.codec.muxer.impl.MuxerImpl
-import com.lmy.codec.muxer.impl.RtmpMuxerImpl
 
 /**
  * Created by lmyooyo@gmail.com on 2018/7/25.
@@ -15,11 +14,7 @@ class MuxerFactory {
             if (TextUtils.isEmpty(context.ioContext.path)) {
                 throw RuntimeException("context.ioContext.path can not be null!")
             }
-            return if (context.ioContext.path!!.startsWith("rtmp")) {
-                RtmpMuxerImpl(context)
-            } else {
-                MuxerImpl(context)
-            }
+            return MuxerImpl(context)
         }
     }
 }
