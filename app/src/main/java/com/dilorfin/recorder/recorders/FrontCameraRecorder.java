@@ -49,7 +49,7 @@ public class FrontCameraRecorder extends Recorder
 
             @Override
             public void onError(int error, String msg) {
-                Logger.error("Front Camera Error: " + msg);
+                ((MainActivity)context).onError("Front Camera Error: " + msg);
             }
 
             @Override

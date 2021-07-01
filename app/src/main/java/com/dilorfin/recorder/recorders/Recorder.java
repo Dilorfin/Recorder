@@ -13,7 +13,7 @@ public abstract class Recorder {
     public abstract void stop();
     public abstract boolean isRecording();
 
-    public void HBRecorderOnError(int errorCode, String reason)
+    public void onError(String message)
     { }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)

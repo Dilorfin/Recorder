@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -19,18 +18,14 @@ import com.dilorfin.recorder.recorders.FrontCameraRecorder;
 import com.dilorfin.recorder.recorders.Recorder;
 import com.dilorfin.recorder.recorders.ScreenRecorder;
 import com.dilorfin.recorder.utils.Logger;
-import com.hbisoft.hbrecorder.HBRecorderListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.hbisoft.hbrecorder.Constants.MAX_FILE_SIZE_REACHED_ERROR;
-import static com.hbisoft.hbrecorder.Constants.SETTINGS_ERROR;
-
 public class MainActivity extends AppCompatActivity
-        implements View.OnClickListener, HBRecorderListener
+        implements View.OnClickListener
 {
     private Recorder[] recorders;
 
@@ -107,7 +102,7 @@ public class MainActivity extends AppCompatActivity
         toggleButton.setChecked(true);
     }
 
-    private void stopRecording()
+    public void stopRecording()
     {
         for (Recorder recorder : recorders) {
             recorder.stop();
@@ -160,40 +155,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void HBRecorderOnStart() { }
-
-    @Override
-    public void HBRecorderOnComplete() { stopRecording(); }
-
-    @Override
-    public void HBRecorderOnError(int errorCode, String reason)
+    public void onError(String message)
     {
-        if (errorCode == MAX_FILE_SIZE_REACHED_ERROR)
-        {
-            Logger.error("HBRecorder max Size reached (" + reason + ")");
-        }
-        else if (errorCode == SETTINGS_ERROR)
-        {
-            // Error 38 happens when
-            // - the selected video encoder is not supported
-            // - the output format is not supported
-            // - if another app is using the microphone
-
-            Logger.error("HBRecorder settings Error (" + reason + ")");
-        }
-        else
-        {
-            Logger.error("HBRecorder " + errorCode + " (" + reason + ")");
-        }
-
+        Logger.error(message);
         Toast.makeText(getApplicationContext(),
                 "An error occurred. Please, try again",
                 Toast.LENGTH_LONG).show();
 
         stopRecording();
         for (Recorder recorder : recorders) {
-            recorder.HBRecorderOnError(errorCode, reason);
+            recorder.onError(message);
         }
     }
 }

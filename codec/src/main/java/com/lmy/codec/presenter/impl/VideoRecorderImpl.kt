@@ -19,8 +19,6 @@ import com.lmy.codec.pipeline.impl.GLEventPipeline
 import com.lmy.codec.presenter.VideoRecorder
 import com.lmy.codec.render.Render
 import com.lmy.codec.render.impl.DefaultRenderImpl
-import com.lmy.codec.texture.impl.filter.BaseFilter
-import com.lmy.codec.texture.impl.filter.NormalFilter
 import com.lmy.codec.util.debug_e
 import com.lmy.codec.util.debug_i
 import com.lmy.codec.wrapper.CameraWrapper
@@ -28,15 +26,14 @@ import com.lmy.codec.wrapper.CameraWrapper
 /**
  * Created by lmyooyo@gmail.com on 2018/8/9.
  */
-class VideoRecorderImpl(ctx: Context
-) : VideoRecorder, Encoder.OnPreparedListener {
+class VideoRecorderImpl(ctx: Context) : VideoRecorder, Encoder.OnPreparedListener
+{
 
     enum class Status {
         IDL, PREPARED, STARTED
     }
 
     private var context: CodecContext = CodecContext(ctx)
-    private var filter: BaseFilter? = NormalFilter()
     private var encoder: Encoder? = null
     private var audioEncoder: Encoder? = null
     private var cameraWrapper: CameraWrapper? = null
@@ -51,11 +48,14 @@ class VideoRecorderImpl(ctx: Context
             throw RuntimeException("context.ioContext.path can not be null!")
         }
         if (null == cameraWrapper) {
+
             cameraWrapper = CameraWrapper.open(context, this)
-                    .post(Runnable {
-                        render = DefaultRenderImpl(context, cameraWrapper!!.textureWrapper,
-                                GLEventPipeline.INSTANCE, filter)
-                    })
+                    .post {
+                        render = DefaultRenderImpl(
+                            context, cameraWrapper!!.textureWrapper,
+                            GLEventPipeline.INSTANCE
+                        )
+                    }
         }
         if (null != textureView && textureView!!.isAvailable) {
             render?.post(Runnable {
@@ -115,7 +115,7 @@ class VideoRecorderImpl(ctx: Context
 
     override fun stop() {
         if (Status.IDL == status) return
-        GLEventPipeline.INSTANCE.queueEvent(Runnable {
+        GLEventPipeline.INSTANCE.queueEvent({
             stopEncoder()
         })
         status = Status.IDL
